@@ -1,0 +1,75 @@
+class SQL:
+
+    def __init__(self, names, columns):
+        self.column_count = {}
+        self.tables = {}
+        self.next_id = {}
+
+        for i in range(len(names)):
+            self.column_count[names[i]] = columns[i]
+            self.tables[names[i]] = {}
+            self.next_id[names[i]] = 1
+
+    def ins(self, name, row):
+
+        # Table exist nahi karti
+        if name not in self.tables:
+            return False
+
+        # Columns ki count galat hai
+        if len(row) != self.column_count[name]:
+            return False
+
+        # Current ID
+        id = self.next_id[name]
+
+        # Row store karo
+        self.tables[name][id] = row
+
+        # Next ID increase karo
+        self.next_id[name] += 1
+
+        return True
+
+    def rmv(self, name, rowId):
+
+        if name not in self.tables:
+            return
+
+        if rowId in self.tables[name]:
+            del self.tables[name][rowId]
+
+    def sel(self, name, rowId, columnId):
+
+        if name not in self.tables:
+            return "<null>"
+
+        if rowId not in self.tables[name]:
+            return "<null>"
+
+        row = self.tables[name][rowId]
+
+        # columnId 1-based hai
+        if columnId < 1 or columnId > len(row):
+            return "<null>"
+
+        return row[columnId - 1]
+
+    def exp(self, name):
+
+        if name not in self.tables:
+            return []
+
+        result = []
+
+        # IDs ko sorted order mein lo
+        ids = sorted(self.tables[name].keys())
+
+        for id in ids:
+
+            row = self.tables[name][id]
+
+            # ID + row values ko comma se join karo
+            result.append(str(id) + "," + ",".join(row))
+
+        return result
